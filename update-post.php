@@ -1,10 +1,24 @@
 <?php
+if(!isset($_GET['id'])){
+    die("not allowed this page");
+}
+include('db/connect.php');
+$pid = $_GET['id'];
+$postQuery = "SELECT * FROM post WHERE id = '$pid'";
+$postResult = mysqli_query($conn,$postQuery);
+if(mysqli_num_rows($postResult)==0){
+    die("no records found");
+}
+$post = mysqli_fetch_assoc($postResult);
+
+
+
 session_start();
  if(!isset($_SESSION['login']) || !$_SESSION['login']==1){
    header('Location:login.php');
  }
  $id = $_SESSION['user_id']; 
- include('db/connect.php');
+ 
  $query = "SELECT * FROM users WHERE id='$id'";
 $result = mysqli_query($conn,$query);
 $data = mysqli_fetch_assoc($result);
@@ -31,11 +45,13 @@ $categoryResult = mysqli_query($conn,$categoryQuery);
 
             <div class="mb-3">
                 <label for="" class="form-label">Title</label>
-                <input type="text" class="form-control" name="title">
+                <input type="text" value="<?php echo $post['title'];?>" class="form-control" name="title">
             </div>
             <div class="mb-3">
                 <label for="" class="form-label"></label>
-                <textarea id="news" class="form-control" name="content"></textarea>
+                <textarea id="news" class="form-control" name="content">
+                    <?php echo $post['content']; ?>
+                </textarea>
             </div>
             <div class="mb-3">
                 <label for="" class="form-label">Cover Image</label>
@@ -46,7 +62,8 @@ $categoryResult = mysqli_query($conn,$categoryQuery);
                 <label for="" class="form-label">Category</label>
                 <select class="form-control" name="category">
                     <?php while($row=mysqli_fetch_assoc($categoryResult)){ ?>
-                            <option value="<?php echo $row['id'];?>"><?php echo $row['title']; ?></option>
+                            <option value="<?php echo $row['id'];?>" <?php if($post['id']){echo "selected"; }?>>
+                            <?php echo $row['title']; ?></option>
                <?php     }?>
                 </select>
             </div>
